@@ -13,7 +13,6 @@ aurora-qa/
 dist/
 build/
 *.egg-info/
-README.md
 messages.json
 
 

@@ -3,6 +3,7 @@ import requests
 
 BASE_URL = "http://localhost:8000"
 
+# simple black-box tests, run with pytest for quick check
 
 def test_health():
     print("\n[TEST] Testing /health endpoint...")
@@ -15,12 +16,17 @@ def test_health():
 
 def test_ask_layla_trip():
     print("\n[TEST] Testing: When is Layla planning her trip to London?")
-    response = requests.get(f"{BASE_URL}/ask", params={"question": "When is Layla planning her trip to London?"})
-    assert response.status_code == 200
-    data = response.json()
-    assert "answer" in data
-    assert isinstance(data["answer"], str)
-    print(f"[PASS] Answer: {data['answer']}")
+    # try/catch helps diagnose if the server died
+    try:
+        response = requests.get(f"{BASE_URL}/ask", params={"question": "When is Layla planning her trip to London?"})
+        assert response.status_code == 200
+        data = response.json()
+        assert "answer" in data
+        assert isinstance(data["answer"], str)
+        print(f"[PASS] Answer: {data['answer']}")
+    except Exception as e:
+        print(f"[debug] Failed Layla test: {e}")
+        raise
 
 
 def test_ask_vikram_cars():

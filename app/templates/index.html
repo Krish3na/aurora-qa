@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<!-- simple Aurora QA chat app, HTML+JS -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurora Question-Answering Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .chat-container {
+            padding: 30px;
+        }
+        
+        .message-window {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .message {
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            word-wrap: break-word;
+        }
+        
+        .message.question {
+            background: #667eea;
+            color: white;
+            text-align: right;
+            margin-left: 20%;
+        }
+        
+        .message.answer {
+            background: #e8e8e8;
+            color: #333;
+            margin-right: 20%;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .question-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .question-input:focus {
+            border-color: #667eea;
+        }
+        
+        .ask-button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .ask-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .ask-button:active {
+            transform: translateY(0);
+        }
+        
+        .ask-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #667eea;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Aurora Question-Answering Service</h1>
+        </div>
+        <div class="chat-container">
+            <!-- Chat/message history -->
+            <div class="message-window" id="messageWindow">
+                <div class="message answer">
+                    Welcome! Ask me anything about the members.
+                </div>
+            </div>
+            <!-- Input/question area -->
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    class="question-input" 
+                    id="questionInput" 
+                    placeholder="Enter your question here..."
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button class="ask-button" id="askButton" onclick="askQuestion()">Ask</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // keypress triggers
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                askQuestion();
+            }
+        }
+        
+        // main ask/answer logic
+        async function askQuestion() {
+            const input = document.getElementById('questionInput');
+            const button = document.getElementById('askButton');
+            const messageWindow = document.getElementById('messageWindow');
+            const question = input.value.trim();
+            
+            if (!question) {
+                return;
+            }
+            
+            button.disabled = true;
+            input.disabled = true;
+            
+            // display user's question
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'message question';
+            questionDiv.textContent = question;
+            messageWindow.appendChild(questionDiv);
+            
+            // add loading indicator
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            loadingDiv.id = 'loading';
+            loadingDiv.textContent = 'Thinking...';
+            messageWindow.appendChild(loadingDiv);
+            messageWindow.scrollTop = messageWindow.scrollHeight;
+            
+            input.value = '';
+            
+            try {
+                // console.log("fetching /ask", question);
+                const response = await fetch(`/ask?question=${encodeURIComponent(question)}`);
+                const data = await response.json();
+                
+                document.getElementById('loading').remove();
+                
+                // display answer
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'message answer';
+                answerDiv.textContent = data.answer;
+                messageWindow.appendChild(answerDiv);
+                messageWindow.scrollTop = messageWindow.scrollHeight;
+                
+            } catch (error) {
+                document.getElementById('loading').remove();
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'message answer';
+                errorDiv.textContent = 'Sorry, an error occurred. Please try again.';
+                messageWindow.appendChild(errorDiv);
+                messageWindow.scrollTop = messageWindow.scrollHeight;
+            } finally {
+                button.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+    </script>
+</body>
+</html>
+

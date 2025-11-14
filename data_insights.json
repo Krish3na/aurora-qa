@@ -1,0 +1,12 @@
+{
+  "total_messages": 100,
+  "unique_members": 10,
+  "duplicate_member_names_over_10_msgs": [
+    "Sophia Al-Farsi",
+    "Fatima El-Tahir",
+    "Hans M\u00fcller"
+  ],
+  "empty_content_messages": 0,
+  "messages_with_dates": 6,
+  "car_count_conflicts": []
+}
