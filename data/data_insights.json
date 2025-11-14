@@ -1,0 +1,126 @@
+{
+  "total_messages": 3349,
+  "unique_members": 10,
+  "duplicate_member_names_over_10_msgs": [
+    "Sophia Al-Farsi",
+    "Fatima El-Tahir",
+    "Armand Dupont",
+    "Hans M\u00fcller",
+    "Layla Kawaguchi",
+    "Amina Van Den Berg",
+    "Vikram Desai",
+    "Lily O'Sullivan",
+    "Lorenzo Cavalli",
+    "Thiago Monteiro"
+  ],
+  "empty_content_messages": 0,
+  "messages_with_dates": 237,
+  "car_count_conflicts": [],
+  "member_message_distribution": [
+    {
+      "member": "Lily O'Sullivan",
+      "count": 365
+    },
+    {
+      "member": "Thiago Monteiro",
+      "count": 361
+    },
+    {
+      "member": "Fatima El-Tahir",
+      "count": 349
+    },
+    {
+      "member": "Sophia Al-Farsi",
+      "count": 346
+    },
+    {
+      "member": "Amina Van Den Berg",
+      "count": 342
+    },
+    {
+      "member": "Vikram Desai",
+      "count": 335
+    },
+    {
+      "member": "Layla Kawaguchi",
+      "count": 330
+    },
+    {
+      "member": "Armand Dupont",
+      "count": 319
+    },
+    {
+      "member": "Hans M\u00fcller",
+      "count": 314
+    },
+    {
+      "member": "Lorenzo Cavalli",
+      "count": 288
+    }
+  ],
+  "monthly_message_counts": [
+    {
+      "month": "2024-11",
+      "count": 209
+    },
+    {
+      "month": "2024-12",
+      "count": 298
+    },
+    {
+      "month": "2025-01",
+      "count": 276
+    },
+    {
+      "month": "2025-02",
+      "count": 263
+    },
+    {
+      "month": "2025-03",
+      "count": 278
+    },
+    {
+      "month": "2025-04",
+      "count": 262
+    },
+    {
+      "month": "2025-05",
+      "count": 277
+    },
+    {
+      "month": "2025-06",
+      "count": 274
+    },
+    {
+      "month": "2025-07",
+      "count": 274
+    },
+    {
+      "month": "2025-08",
+      "count": 310
+    },
+    {
+      "month": "2025-09",
+      "count": 257
+    },
+    {
+      "month": "2025-10",
+      "count": 297
+    },
+    {
+      "month": "2025-11",
+      "count": 74
+    }
+  ],
+  "keyword_mentions": {
+    "trip": 163,
+    "travel": 46,
+    "flight": 136,
+    "car": 164,
+    "vehicle": 3,
+    "restaurant": 96,
+    "reservation": 158
+  },
+  "anomaly_counts": {},
+  "anomalies": []
+}

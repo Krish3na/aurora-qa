@@ -1,17 +1,51 @@
+import asyncio
+import json
 import time
 from dataclasses import dataclass
-import httpx
+from pathlib import Path
+
+from .fetch_all_messages import fetch_all
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-MESSAGES_URL = "https://november7-730026606190.europe-west1.run.app/messages/"
-CACHE_TTL_SECONDS = 15 * 60  # Refresh every 15 minutes
+CACHE_TTL_SECONDS = 30 * 60  # Refresh every 30 minutes (read-heavy cache)
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "data"
+DATA_DIR.mkdir(exist_ok=True)
+LOCAL_DUMP = DATA_DIR / "messages_fetch_full.json"
+FALLBACK_DUMP = DATA_DIR / "messages_full.json"
+SAMPLE_DUMP = DATA_DIR / "messages.json"
+
 
 @dataclass
 class RetrievedMessage:
     text: str
     score: float
     meta: dict
+
+
+def _load_messages_from(path: Path):
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(data, dict) and isinstance(data.get("items"), list):
+            return data["items"]
+        if isinstance(data, list):
+            return data
+    except json.JSONDecodeError:
+        pass
+    return []
+
+
+def _load_local_messages(prefer_primary=True):
+    sources = [LOCAL_DUMP, FALLBACK_DUMP, SAMPLE_DUMP] if prefer_primary else [FALLBACK_DUMP, LOCAL_DUMP, SAMPLE_DUMP]
+    for path in sources:
+        data = _load_messages_from(path)
+        if data:
+            return data
+    return []
+
 
 class MessagesRetriever:
     def __init__(self):
@@ -22,23 +56,9 @@ class MessagesRetriever:
 
     def _should_refresh(self):
         # print("Checking if we should refresh cache...")
-        # always refresh if it's too old or matrix is None
         return (time.time() - self._last_refresh) > CACHE_TTL_SECONDS or self._matrix is None
 
-    async def _fetch_messages(self):
-        # print("Fetching messages from public API...")
-        async with httpx.AsyncClient(timeout=20, follow_redirects=True) as client:
-            resp = await client.get(MESSAGES_URL)
-            resp.raise_for_status()
-            data = resp.json()
-            # The API may return either a list or an envelope with items
-            if isinstance(data, dict) and isinstance(data.get("items"), list):
-                return data["items"]
-            if isinstance(data, list):
-                return data
-            raise ValueError("Unexpected response format from messages API")
-
-    def _build_corpus(self, messages):
+    def _build_model(self, messages):
         corpus = []
         docs = []
         for msg in messages:
@@ -49,18 +69,27 @@ class MessagesRetriever:
             joined = f"{member_name} {content}".strip()
             corpus.append(joined)
             docs.append(msg)
-        # print(f"Corpus constructed, {len(corpus)} docs")
-        return corpus, docs
-
-    async def refresh(self):
-        messages = await self._fetch_messages()
-        corpus, docs = self._build_corpus(messages)
-        # Fit TF-IDF model
         vectorizer = TfidfVectorizer(stop_words="english", max_features=50000, ngram_range=(1, 2))
         matrix = vectorizer.fit_transform(corpus) if corpus else None
         self._vectorizer = vectorizer
         self._matrix = matrix
         self._docs = docs
+
+    async def refresh(self):
+        # Load whatever data we already have before fetching to avoid empty responses
+        cached_messages = _load_local_messages()
+        if cached_messages:
+            self._build_model(cached_messages)
+
+        try:
+            await asyncio.to_thread(fetch_all, limit=100, delay=1)
+        except Exception as exc:
+            print(f"fetch_all failed: {exc}")
+
+        messages = _load_local_messages()
+        if messages:
+            self._build_model(messages)
+
         self._last_refresh = time.time()
         # print("Retriever cache refreshed!")
 
