@@ -135,10 +135,18 @@ def answer_question(question, retrieved):
 				if member:
 					return f"{member}'s trip is on {date}."
 				return f"The trip is on {date}."
-		# no explicit date found – fall back to a helpful summary of the top message
+		# if no clear date is present, prefer a longer message that actually talks about trips
+		travel_keywords = ["trip", "trips", "travel", "flight", "itinerary"]
+		for r in scope:
+			text_l = r.text.lower()
+			if any(kw in text_l for kw in travel_keywords) and len(r.text.strip()) > 20:
+				raw = r.meta.get("message") or r.text
+				if member:
+					return f"{member} mentioned: {raw}"
+				return raw
+		# final fallback: just show the top message for transparency
 		if scope:
-			top = scope[0]
-			raw = top.meta.get("message") or top.text
+			raw = scope[0].meta.get("message") or scope[0].text
 			if member:
 				return f"{member} mentioned: {raw}"
 			return raw
