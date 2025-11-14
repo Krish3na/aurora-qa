@@ -37,6 +37,14 @@ The implementation combines a TF-IDF retriever with lightweight heuristics for d
 - “How many cars does Vikram Desai have?”
 - “What are Amira’s favorite restaurants?”
 
+### UI Screenshots
+
+These screenshots show the small chat-style web UI that sits on top of the FastAPI backend:
+
+![Aurora QA empty state](UI.png)
+
+![Aurora QA with example questions](UI_working.png)
+
 This service uses a TF‑IDF retriever on top of the messages, with light heuristics to extract dates, counts, and restaurant names for common question types. It falls back to returning the most relevant supporting message if no direct extraction succeeds.
 
 ---
