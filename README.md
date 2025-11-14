@@ -37,6 +37,12 @@ The implementation combines a TF-IDF retriever with lightweight heuristics for d
 - “How many cars does Vikram Desai have?”
 - “What are Amira’s favorite restaurants?”
 
+### Deployed URL (Render)
+
+You can try the service live at: `https://aurora-qa-qncl.onrender.com/`
+
+Demo video: `https://youtu.be/eV0YeiZ3OSU`
+
 ### UI Screenshots
 
 These screenshots show the small chat-style web UI that sits on top of the FastAPI backend:
