@@ -39,9 +39,9 @@ The implementation combines a TF-IDF retriever with lightweight heuristics for d
 
 ### Deployed URL (Render)
 
-You can try the service live at: `https://aurora-qa-qncl.onrender.com/`
+You can try the service live at: [aurora-qa on Render](https://aurora-qa-qncl.onrender.com/)
 
-Demo video: `https://youtu.be/eV0YeiZ3OSU`
+Demo video: [YouTube demo](https://youtu.be/eV0YeiZ3OSU)
 
 ### UI Screenshots
 
