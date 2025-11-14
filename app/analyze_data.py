@@ -192,16 +192,20 @@ def _plot_keyword_coverage(keyword_counts, out_path):
 
 # anomalies histogram for quick spotting of odd rows.
 def _plot_anomaly_histogram(anomaly_counts, out_path):
-    if not anomaly_counts:
-        return
-    types = list(anomaly_counts.keys())
-    counts = [anomaly_counts[t] for t in types]
+    # Always emit a chart so reviewers see that we checked for anomalies.
     plt.figure(figsize=(10, 4))
-    plt.bar(types, counts, color="#e07b39")
-    plt.title("Anomaly Counts")
-    plt.ylabel("Count")
-    plt.xticks(rotation=45)
-    plt.tight_layout()
+    if not anomaly_counts:
+        plt.title("Anomaly Counts (none detected)")
+        plt.text(0.5, 0.5, "No anomalies found", ha="center", va="center", fontsize=12)
+        plt.axis("off")
+    else:
+        types = list(anomaly_counts.keys())
+        counts = [anomaly_counts[t] for t in types]
+        plt.bar(types, counts, color="#e07b39")
+        plt.title("Anomaly Counts")
+        plt.ylabel("Count")
+        plt.xticks(rotation=45)
+        plt.tight_layout()
     plt.savefig(out_path)
     plt.close()
 

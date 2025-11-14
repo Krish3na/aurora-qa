@@ -135,9 +135,14 @@ def answer_question(question, retrieved):
 				if member:
 					return f"{member}'s trip is on {date}."
 				return f"The trip is on {date}."
-		# print("No date for trip found; fallback to top candidate")
-		# fallback
-		return scope[0].text if scope else "Sorry, I couldn't find travel details."
+		# no explicit date found – fall back to a helpful summary of the top message
+		if scope:
+			top = scope[0]
+			raw = top.meta.get("message") or top.text
+			if member:
+				return f"{member} mentioned: {raw}"
+			return raw
+		return "Sorry, I couldn't find travel details."
 
 	if "how many" in q_l and ("car" in q_l or "vehicle" in q_l):
 		for r in scope:
