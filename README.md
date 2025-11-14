@@ -113,7 +113,7 @@ Alternative hosts (also work with the Dockerfile):
 I explored several strategies for building the QA capability:
 
 1. **TF‑IDF retrieval + heuristics (implemented)**  
-   The service uses TF‑IDF to surface the most relevant messages and then applies regex/keyword heuristics in `app/qa.py` to extract dates, numbers, or restaurant names. It keeps the dependencies minimal, keeps the Docker image small, and still handles the example questions deterministically. The downside is that those heuristics rely on matching keywords and patterns, so they need to be expanded for new question types.
+   The service uses TF‑IDF to surface the most relevant messages and then applies regex/keyword heuristics in `app/qa.py` to extract dates, numbers, or restaurant names. Under the hood, the retriever builds a TF‑IDF index over all member messages, which basically turns each message into a “bag of words” vector and scores how well it matches the question. That gives us a small set of highly relevant messages in a few milliseconds, without any external APIs or heavy ML models. On top of that, `app/qa.py` runs simple rules: regexes to pull out dates, a small window around “car/cars/vehicle” to count cars, and proper‑noun extraction to guess restaurant names. If those patterns don’t fire, it just returns the top supporting message verbatim so the answer is always grounded in a real member message.
 
 2. **TF‑IDF retrieval + a local slot-filling model**  
    Could capture structured elements (dates, numbers) without calling external services. This would add model artifacts and require tuning, so I avoided it in favor of straightforward heuristics.
